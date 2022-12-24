@@ -1,0 +1,47 @@
+import random
+import time
+
+
+Yours = raw_input("Write which one you pick Rock, Paper or Scissors? (This is case sensitive)")
+
+if Yours.isalpha():
+    pass
+else:
+    print "No...."
+    exit()
+
+Mine = random.randint(1, 3)
+if Mine == 1:
+    Mine = 'Rock'
+elif Mine == 2:
+    Mine = 'Paper'
+elif Mine == 3:
+    Mine = 'Scissors'
+
+print "3"
+time.sleep(.5)
+print "2"
+time.sleep(.5)
+print "1"
+time.sleep(.5)
+
+if Yours == "Rock" and Mine == "Rock":
+    print ("Tie. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Rock" and Mine == "Paper":
+    print ("I win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Rock" and Mine == "Scissors":
+    print ("You win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+
+if Yours == "Paper" and Mine == "Rock":
+    print ("You win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Paper" and Mine == "Paper":
+    print ("Tie. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Paper" and Mine == "Scissors":
+    print ("I win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+
+if Yours == "Scissors" and Mine == "Rock":
+    print ("I win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Scissors" and Mine == "Paper":
+    print ("You win. " + 'Mine is ' + Mine + ", Yours is " + Yours)
+if Yours == "Scissors" and Mine == "Scissors":
+    print ("Tie. " + 'Mine is ' + Mine + ", Yours is " + Yours)

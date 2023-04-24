@@ -1,0 +1,283 @@
+from replit import db
+import getpass
+from Stocks import stock
+from Stocks import symbols
+import os
+import time
+import random
+
+#------------COMMENTS FROM MYSELF VERY IMPORTATANT------------
+# do import yfinance for stock prices!!!!!
+#MAKE IT SO THAT YOU FINDUSER EVERY TIME YOU BUY SOETHING TO UPDATE IT!!!
+#------------------------------------------------------------#
+#ADD CODES YOU CAN DO AND ADD A CODE TO DELETE EVERYTING
+# COMMEMNTS
+
+#Add a feature to sell stocks that the user owns.
+#Allow the user to view their stock portfolio and how much they have invested in each stock.
+#Add a leaderboard to show the top 10 users with the most money.
+#Create a mini-game where the user can earn extra money or experience points.
+#Add a news section where the user can see the latest stock market news and updates.
+#Allow the user to invest in more than just stocks, such as commodities or mutual funds.
+#Create a tutorial section to help new users understand the basics of the game.
+#Add a feature to allow the user to borrow money from the bank to invest in stocks.
+#Allow the user to set alerts for specific stocks to notify them of any changes in price.
+#Create different levels of difficulty, each with their own challenges and rewards.
+
+# Variables are on top
+scrtee = os.environ["info"]
+scrteee = os.environ["infoo"]
+
+
+
+
+
+
+keys = db.keys()
+values = db.values()
+
+
+def loading_screen(num):
+    countxxx = 0
+    for i in range(1, num * 3 + 1):
+        if countxxx == 0:
+            print("Loading.")
+        elif countxxx == 1:
+            print("Loading..")
+        elif countxxx == 2:
+            print("Loading...")
+            countxxx = -1 # reset to -1 since count will be incremented below
+        countxxx += 1
+        time.sleep(0.8) # adds a delay
+
+def shevessstocks(name, times):
+  stock_str = name  
+  old_list = db.get(username2)
+  for i in range(times):
+    old_list.append(stock_str)
+    db[username2] = old_list
+
+
+
+def refreshvariables():
+  findvariables = db[username + "1"]
+  findvariablesforstonk = db.get(username + "2")
+
+  moneyexpereience = findvariables.split()
+  if len(findvariablesforstonk) <= 0:
+    moneyexpereiences = []
+  elif len(findvariablesforstonk) >= 1:
+    moneyexpereiences = findvariablesforstonk
+  global money
+  global experience_level
+  global stocks
+  money = moneyexpereience[0]
+  experience_level = moneyexpereience[1]
+  stocks = moneyexpereiences
+
+
+
+def finduser(): #Gets the account info 
+  global username1
+  global username2
+  global money
+  global experience_level
+  global stocks
+
+  username1 = username + "1"
+  username2 = username + "2"
+
+
+  findvariables = db[username + "1"]
+  findvariablesforstonk = db.get(username + "2")
+
+
+  moneyexpereience = findvariables.split()
+  
+  if len(findvariablesforstonk) <= 0:
+    moneyexpereiences = []
+  elif len(findvariablesforstonk) >= 1:
+    moneyexpereiences = findvariablesforstonk
+
+  money = moneyexpereience[0]
+  experience_level = moneyexpereience[1]
+  stocks = moneyexpereiences
+  
+  loading_screen(random.choice([0, 1, 2]))
+  gamestart()
+  
+def login():
+  global username
+  username = input("\nEnter your username?: ")
+  if username not in keys:
+    print("Invalid username. Please try again. (run again to go to menu)")
+    login()
+  else:
+      password = getpass.getpass(prompt = "\nEnter your password: ", stream = None)
+      print('*' * len(password))
+      print("\n")
+      if password != db[username]:
+        print("That password does not match the username. Try again.")
+        login()
+      else:
+        finduser()
+
+
+def signup():
+  usrnme = input("\nEnter your desired username: ") 
+  if usrnme in db.keys():
+    print("That username is already taken. Please choose another one. (Type \"go back\" to go back to the menu)")
+    signup()
+  elif usrnme == "go back":
+    Start()
+  elif usrnme.isalpha() == False:
+    print("You can only have letters in your username.")
+    signup()
+  elif len(usrnme) <= 1:
+    print("Your username can only be 2-10 letters long.")
+    signup()
+  elif len(usrnme) >= 11:
+    print("Your username can only be 2-10 letters long.")
+    signup()
+      
+      
+  else:
+    pswrd = getpass.getpass(prompt = "\nEnter your desired password: ", stream = None) # creates the paswrd
+    print('*' * len(pswrd))
+    print("\n")
+    
+    pswrd2 = getpass.getpass(prompt = "Confirm your desired password: ", stream = None) # confirms the paswrd
+    print('*' * len(pswrd2))
+    
+    if pswrd != pswrd2: # checks if the password equals the password
+      print("You wrote your password wrong. Try again.")
+      signup()
+    else:
+      print("Ok, now use that username and password to sign in. (Run again)")
+      db[usrnme] = pswrd
+      db[usrnme + "1"] = "500 1 0" #for the game, it is "money  experience_level "
+      db[usrnme + "2"] = ["First_stock"] # the stock #CHANGE IT TO []
+      exit() #exits so they need to use their username to sign in
+
+def stockss():
+  global money
+  wow()
+  print("Stocks are:\n")
+  stock(50, 50)
+  whichstock = input("\nWhich stock do you want to buy? (write 1-23): ")
+  if whichstock not in symbols:
+    print("That is not one of the stock symbols.")
+    time.sleep(2)
+    stockss()
+  else:
+    fakekey, fakevalue = stock(whichstock, whichstock)
+    keye = fakekey
+    cost_of_stock = float(fakevalue)
+    rusuress = input("Are you sure you want to buy " + str(keye) + " for $" + str(float(cost_of_stock)) + "? (write Yes or No): ")
+    if rusuress.lower() == "no":
+      stockss()
+    elif rusuress.lower() == "yes":
+      pass
+    elif rusuress.lower() != "yes" or "no":
+      print("I don't understand what you mean.")
+      time.sleep(1)
+      menue()
+    
+    shares = int(input("How many shares do you want to buy of " + keye + "?: "))
+    
+    if shares <= 0:
+      dooyouwanttobuy = input("You don't wan't to buy any stocks? (write Yes or No): ")
+      if dooyouwanttobuy.lower() == "yes":
+        menue()
+      elif dooyouwanttobuy.lower() == "no":
+        stockss()
+      else:
+        print("I don't know what you mean by that.")
+        menue()
+      
+      
+    cost = float(shares) * float(cost_of_stock)
+    if float(cost) > float(money):
+      print("Insufficient funds.")
+      time.sleep(1)
+      stockss()
+    else:
+      money = float(money) - float(cost)
+      loading_screen(random.choice([1, 2, 3]))
+      
+      shevessstocks(keye, shares) #Keys * shares
+      
+      print("Transaction complete.")
+      time.sleep(2)
+      wow()
+      menue()
+    
+
+
+
+def Start():
+  while True:
+    loginsignup = input("Would you like to login or signup? (Enter 'login' or 'signup'): ")
+    if loginsignup.lower() == "login":
+      login()
+      break
+    elif loginsignup.lower() == "signup":
+      signup()
+      break
+    else:
+      print("Invalid input. Please enter either 'login' or 'signup'.")
+
+
+def menue():
+  refreshvariables() 
+  print("\nMoney: ", float(money), "$")
+  print("Experience level: ", experience_level)
+  if len(stocks) == 0:
+    print("Stocks: None")
+  else:
+    print("Stocks: ", list(stocks))
+    
+  answr = input("\nWrite 'stocks', 'codes', or 'mystocks' to go there: ")
+
+  if answr.lower() == "stocks":
+    stockss()
+
+    
+    
+  elif answr.lower() == "codes":
+    code = input("What is your code?: ")
+    if code == scrtee:
+      db.clear()
+      print("Clear complete.\n")
+      menue()
+    elif code == scrteee:
+      keys = db.keys()
+      values = db.values()
+      print(keys)
+      print(values)
+  else:
+    print("I don't understand what you mean.")
+    answr = ""
+    wow()
+    menue()
+    
+    
+def gamestart():
+  menue()
+
+def wow():
+  print("\n" * 30) #NEW LINES
+# Variables and stuff---------------------
+
+print("This is a game about buying stocks.\n")
+
+
+Start()
+
+
+
+#make a game where you create account where you buy stuff and gain stuff with stocks
+
+
+
+  

@@ -1,14 +1,17 @@
-from replit import db
-import getpass
-from Stocks import stock
-from Stocks import symbols
-import os
-import time
+from replit import db #the database
+import getpass #for the password
+import os #secrets
+import time 
 import random
+#imports from this repl below
+from Stocks import stock #from this repl
+from realtimestock import real_symbols
+from realtimestock import printsymbolpricesandstuff
+from realtimestock import stonke
+####################################################################################
 
 #------------COMMENTS FROM MYSELF VERY IMPORTATANT------------
-# do import yfinance for stock prices!!!!!
-#MAKE IT SO THAT YOU FINDUSER EVERY TIME YOU BUY SOETHING TO UPDATE IT!!!
+# cost 10 to sell or buy stock
 #------------------------------------------------------------#
 #ADD CODES YOU CAN DO AND ADD A CODE TO DELETE EVERYTING
 # COMMEMNTS
@@ -27,6 +30,7 @@ import random
 # Variables are on top
 scrtee = os.environ["info"]
 scrteee = os.environ["infoo"]
+scrteeee = os.environ["infooo"]
 
 
 
@@ -36,6 +40,8 @@ scrteee = os.environ["infoo"]
 keys = db.keys()
 values = db.values()
 
+def wow():
+  print("\n" * 30) #NEW LINES
 
 def loading_screen(num):
     countxxx = 0
@@ -48,15 +54,30 @@ def loading_screen(num):
             print("Loading...")
             countxxx = -1 # reset to -1 since count will be incremented below
         countxxx += 1
-        time.sleep(0.8) # adds a delay
+        time.sleep(0.01) # adds a delay 0.8
 
-def shevessstocks(name, times):
-  stock_str = name  
+def shevessstocks(name, times, plusorminus):
   old_list = db.get(username2)
-  for i in range(times):
-    old_list.append(stock_str)
-    db[username2] = old_list
 
+  if plusorminus == "plus":
+    old_list[name] += int(times)
+  elif plusorminus == "minus":
+    old_list[name] -= int(times)
+  
+  db[username2] = old_list
+
+def shevessmoocha(amount, plusorminus):
+  the_money = db.get(username1)
+  split_the_money = the_money.split() #["money", "exp"]
+  monnehy = split_the_money[0] #["money"]
+
+  if plusorminus == "plus":
+    newmonnehy = float(monnehy) + float(amount)
+    updated_stufefe = str(newmonnehy) + " " + str(split_the_money[1])
+  elif plusorminus == "minus":
+    newmonnehy = float(monnehy) - float(amount)
+    updated_stufefe = str(newmonnehy) + " " + str(split_the_money[1])
+  db[username1] = updated_stufefe
 
 
 def refreshvariables():
@@ -64,10 +85,7 @@ def refreshvariables():
   findvariablesforstonk = db.get(username + "2")
 
   moneyexpereience = findvariables.split()
-  if len(findvariablesforstonk) <= 0:
-    moneyexpereiences = []
-  elif len(findvariablesforstonk) >= 1:
-    moneyexpereiences = findvariablesforstonk
+  moneyexpereiences = findvariablesforstonk
   global money
   global experience_level
   global stocks
@@ -75,6 +93,21 @@ def refreshvariables():
   experience_level = moneyexpereience[1]
   stocks = moneyexpereiences
 
+def checkstocks():
+  global listofstonke
+  refreshvariables() 
+  stonke_list = db.get(username2)
+  listofstonke = {}
+
+  for key, value in stonke_list.items():
+    if value >= 1:
+      listofstonke[key] = value
+  if len(listofstonke) == 0:
+    print("Stocks you have: None")
+  elif len(listofstonke) > 0 :
+    print("Stocks you have:\n") 
+    for kee, vaa in listofstonke.items():
+      print(f"{kee}: {vaa}")
 
 
 def finduser(): #Gets the account info 
@@ -94,10 +127,7 @@ def finduser(): #Gets the account info
 
   moneyexpereience = findvariables.split()
   
-  if len(findvariablesforstonk) <= 0:
-    moneyexpereiences = []
-  elif len(findvariablesforstonk) >= 1:
-    moneyexpereiences = findvariablesforstonk
+  moneyexpereiences = findvariablesforstonk #keep
 
   money = moneyexpereience[0]
   experience_level = moneyexpereience[1]
@@ -155,64 +185,108 @@ def signup():
     else:
       print("Ok, now use that username and password to sign in. (Run again)")
       db[usrnme] = pswrd
-      db[usrnme + "1"] = "500 1 0" #for the game, it is "money  experience_level "
-      db[usrnme + "2"] = ["First_stock"] # the stock #CHANGE IT TO []
+      db[usrnme + "1"] = "500 1" #for the game, it is "money  experience_level "
+      db[usrnme + "2"] = {'DOGE-CAD': 0, 'SBUX': 0, 'AAPL': 0, 'TSLA': 0, 'AMZN': 0, 'MSFT': 0, 'NVDA': 0, 'META': 0, 'NFLX': 0, "ISRG": 0, 'BA': 0, 'ADBE': 0, 'MA': 0, 'RML.NS': 0, 'ZC=F': 0, 'EQIX': 0, 'REGN': 0, 'MELI': 0, 'MKL': 0, 'MTD': 0, 'CMG': 0, '^RUT': 0, 'TPL': 0, "ALI=F": 0, 'AZO': 0, 'BKNG': 0, 'SEB': 0, 'NVR': 0, 'NXT.L': 0, 'LDSVF': 0, 'LISP.SW': 0, 'BTC-CAD': 0, 'LISN.SW': 0, '0QKN.L': 0, 'BRK-A': 0} # the stocks. 
       exit() #exits so they need to use their username to sign in
 
 def stockss():
   global money
   wow()
-  print("Stocks are:\n")
-  stock(50, 50)
-  whichstock = input("\nWhich stock do you want to buy? (write 1-23): ")
-  if whichstock not in symbols:
-    print("That is not one of the stock symbols.")
-    time.sleep(2)
+
+  immediatebuy = input("Do you want to buy a stock, look at the stocks, sell a stock, or go back to the menue? \n(write \"buy\" or \"look\" or \"sell\" or \"menue\"): ")
+  if immediatebuy.lower() == "look":
+    print("Stocks are:\n")
+    time.sleep(1)
+    printsymbolpricesandstuff()
+  elif immediatebuy.lower() != "look" and immediatebuy.lower() != "buy" and immediatebuy.lower() != "sell" and immediatebuy.lower() != "menue":
+    print("I don't understand what you mean by that.")
     stockss()
-  else:
-    fakekey, fakevalue = stock(whichstock, whichstock)
-    keye = fakekey
-    cost_of_stock = float(fakevalue)
-    rusuress = input("Are you sure you want to buy " + str(keye) + " for $" + str(float(cost_of_stock)) + "? (write Yes or No): ")
-    if rusuress.lower() == "no":
-      stockss()
-    elif rusuress.lower() == "yes":
-      pass
-    elif rusuress.lower() != "yes" or "no":
-      print("I don't understand what you mean.")
-      time.sleep(1)
-      menue()
-    
-    shares = int(input("How many shares do you want to buy of " + keye + "?: "))
-    
-    if shares <= 0:
-      dooyouwanttobuy = input("You don't wan't to buy any stocks? (write Yes or No): ")
-      if dooyouwanttobuy.lower() == "yes":
-        menue()
-      elif dooyouwanttobuy.lower() == "no":
-        stockss()
-      else:
-        print("I don't know what you mean by that.")
-        menue()
-      
-      
-    cost = float(shares) * float(cost_of_stock)
-    if float(cost) > float(money):
-      print("Insufficient funds.")
-      time.sleep(1)
+  elif immediatebuy.lower() == "menue":
+    menue()
+  elif immediatebuy.lower() == "buy":
+    whichstock = input("\nWhich stock do you want to buy? (write the stock symbol): ")
+    if whichstock not in real_symbols:
+      print("That is not one of the stock symbols.")
+      time.sleep(2)
       stockss()
     else:
-      money = float(money) - float(cost)
-      loading_screen(random.choice([1, 2, 3]))
+      fakekey, fakevalue = stonke(whichstock, whichstock)
+      keye = fakekey
+      cost_of_stock = float(fakevalue)
+      rusuress = input("Are you sure you want to buy " + str(keye) + " for $" + str(float(cost_of_stock)) + "? (write Yes or No): ")
+      if rusuress.lower() == "no":
+        stockss()
+      elif rusuress.lower() == "yes":
+        pass
+      elif rusuress.lower() != "yes" or "no":
+        print("I don't understand what you mean.")
+        time.sleep(1)
+        menue()
       
-      shevessstocks(keye, shares) #Keys * shares
+      shares = int(input("How many shares do you want to buy of " + keye + "?: "))
       
-      print("Transaction complete.")
-      time.sleep(2)
-      wow()
-      menue()
-    
+      if shares <= 0:
+        dooyouwanttobuy = input("You don't wan't to buy any stocks? (write Yes or No): ")
+        if dooyouwanttobuy.lower() == "yes":
+          menue()
+        elif dooyouwanttobuy.lower() == "no":
+          stockss()
+        else:
+          print("I don't know what you mean by that.")
+          menue()
+        
+        
+      cost = float(shares) * float(cost_of_stock)
+      if float(cost) > float(money):
+        print("Insufficient funds.")
+        time.sleep(1)
+        stockss()
+      else:
+        #money = float(money) - float(cost) delte this?
+        loading_screen(random.choice([1, 2, 3]))
+        
+        shevessstocks(keye, shares, "plus") #putting it in the stoks they have 
 
+        shevessmoocha(cost, "minus")
+        
+        print("Transaction complete.")
+        time.sleep(2)
+        wow()
+        menue()
+  elif immediatebuy.lower() == "sell":
+    print("\n") #newline
+    checkstocks() #print which stocks you have
+    print("\n")
+    
+    wannabuyorselle = input("Do you want to sell a stock or go to the menue? (write \"sell\" or \"menue\"): ")
+    if wannabuyorselle.lower() == "menue":
+      menue()
+    elif wannabuyorselle.lower() != "sell" and wannabuyorselle.lower() != "menue":
+      print("You didn't write \"sell\" or \"menue\".")
+      stockss()
+    elif wannabuyorselle.lower() == "sell":
+      sellwhichonese = input("\nWhich symbol(s) do you want to sell?: ") #the name of symbol
+      if sellwhichonese not in listofstonke:
+        print("\nYou don't have that symbol.")
+        time.sleep(1)
+        stockss()
+      elif sellwhichonese in listofstonke:
+        howmanywannasell = input("\nHow many shares do you want to sell?: ") #shares
+        if int(howmanywannasell) > listofstonke[sellwhichonese]:
+          print("\nYou don't have that many shares.")
+          time.sleep(1)
+          stockss()
+        elif int(howmanywannasell) <= listofstonke[sellwhichonese]:
+          shevessstocks(sellwhichonese, howmanywannasell, "minus")
+
+          dakey, davalue = stonke(sellwhichonese, sellwhichonese)
+
+          multiply = float(davalue) * float(howmanywannasell)
+          
+          shevessmoocha(multiply, "plus")
+          print("Sell complete.")
+          time.sleep(2)
+          menue()
 
 
 def Start():
@@ -229,32 +303,48 @@ def Start():
 
 
 def menue():
+  rounded_moocha = round(float(money), 2)
   refreshvariables() 
-  print("\nMoney: ", float(money), "$")
+  print("\nMoney: ", rounded_moocha, "$")
   print("Experience level: ", experience_level)
-  if len(stocks) == 0:
-    print("Stocks: None")
-  else:
-    print("Stocks: ", list(stocks))
+  print("\nStocks:\n")
+  for k, v in stocks.items():
+    print(f"{k}: {v}")
     
   answr = input("\nWrite 'stocks', 'codes', or 'mystocks' to go there: ")
 
   if answr.lower() == "stocks":
-    stockss()
-
-    
+    stockss()    
     
   elif answr.lower() == "codes":
     code = input("What is your code?: ")
     if code == scrtee:
       db.clear()
       print("Clear complete.\n")
-      menue()
+      exit()
     elif code == scrteee:
       keys = db.keys()
       values = db.values()
       print(keys)
       print(values)
+    elif code == scrteeee:
+      asiaepfspi = input("Plus/minus: ")
+      ashoiasefiasp = input("Amount: ")
+      if asiaepfspi.lower() == "plus":
+        shevessmoocha(ashoiasefiasp, "plus")
+        menue()
+      elif asiaepfspi.lower() == "minus":
+        shevessmoocha(ashoiasefiasp, "minus")
+        menue()
+    else:
+      print("That is not a code.")
+      menue()
+
+  elif answr.lower() == "mystocks":
+    checkstocks()
+    time.sleep(2)
+    menue()
+      
   else:
     print("I don't understand what you mean.")
     answr = ""
@@ -265,8 +355,7 @@ def menue():
 def gamestart():
   menue()
 
-def wow():
-  print("\n" * 30) #NEW LINES
+
 # Variables and stuff---------------------
 
 print("This is a game about buying stocks.\n")

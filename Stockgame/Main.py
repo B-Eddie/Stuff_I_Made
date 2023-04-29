@@ -2,9 +2,9 @@ from replit import db #the database
 import getpass #for the password
 import os #secrets
 import time 
+import datetime
 import random
 #imports from this repl below
-from Stocks import stock #from this repl
 from realtimestock import real_symbols
 from realtimestock import printsymbolpricesandstuff
 from realtimestock import stonke
@@ -16,7 +16,7 @@ from realtimestock import stonke
 #ADD CODES YOU CAN DO AND ADD A CODE TO DELETE EVERYTING
 # COMMEMNTS
 
-#Add a feature to sell stocks that the user owns.
+
 #Allow the user to view their stock portfolio and how much they have invested in each stock.
 #Add a leaderboard to show the top 10 users with the most money.
 #Create a mini-game where the user can earn extra money or experience points.
@@ -33,6 +33,9 @@ scrteee = os.environ["infoo"]
 scrteeee = os.environ["infooo"]
 
 
+
+rihtnow = datetime.datetime.now()
+date_string = rihtnow.strftime("%d/%m/%Y")
 
 
 
@@ -79,19 +82,32 @@ def shevessmoocha(amount, plusorminus):
     updated_stufefe = str(newmonnehy) + " " + str(split_the_money[1])
   db[username1] = updated_stufefe
 
+def historychange(nameyes):
+  list_of_three = db.get(username3)
+  seperatedlen = []
+
+
+  seperatedlen = list_of_three
+
+
+  seperatedlen.append(nameyes)
+  db[username3] = seperatedlen
 
 def refreshvariables():
   findvariables = db[username + "1"]
   findvariablesforstonk = db.get(username + "2")
-
+  findvariable_history = db.get(username + "3")
+  
   moneyexpereience = findvariables.split()
   moneyexpereiences = findvariablesforstonk
   global money
   global experience_level
   global stocks
+  global history
   money = moneyexpereience[0]
   experience_level = moneyexpereience[1]
   stocks = moneyexpereiences
+  history = findvariable_history
 
 def checkstocks():
   global listofstonke
@@ -113,22 +129,26 @@ def checkstocks():
 def finduser(): #Gets the account info 
   global username1
   global username2
+  global username3
   global money
   global experience_level
   global stocks
+  global history
 
   username1 = username + "1"
   username2 = username + "2"
-
+  username3 = username + "3"
 
   findvariables = db[username + "1"]
   findvariablesforstonk = db.get(username + "2")
+  findvariable_history = db.get(username + "3")
 
 
   moneyexpereience = findvariables.split()
   
   moneyexpereiences = findvariablesforstonk #keep
 
+  history = findvariable_history
   money = moneyexpereience[0]
   experience_level = moneyexpereience[1]
   stocks = moneyexpereiences
@@ -187,6 +207,7 @@ def signup():
       db[usrnme] = pswrd
       db[usrnme + "1"] = "500 1" #for the game, it is "money  experience_level "
       db[usrnme + "2"] = {'DOGE-CAD': 0, 'SBUX': 0, 'AAPL': 0, 'TSLA': 0, 'AMZN': 0, 'MSFT': 0, 'NVDA': 0, 'META': 0, 'NFLX': 0, "ISRG": 0, 'BA': 0, 'ADBE': 0, 'MA': 0, 'RML.NS': 0, 'ZC=F': 0, 'EQIX': 0, 'REGN': 0, 'MELI': 0, 'MKL': 0, 'MTD': 0, 'CMG': 0, '^RUT': 0, 'TPL': 0, "ALI=F": 0, 'AZO': 0, 'BKNG': 0, 'SEB': 0, 'NVR': 0, 'NXT.L': 0, 'LDSVF': 0, 'LISP.SW': 0, 'BTC-CAD': 0, 'LISN.SW': 0, '0QKN.L': 0, 'BRK-A': 0} # the stocks. 
+      db[usrnme + "3"] = ["You made an account!"] #history
       exit() #exits so they need to use their username to sign in
 
 def stockss():
@@ -198,8 +219,11 @@ def stockss():
     print("Stocks are:\n")
     time.sleep(1)
     printsymbolpricesandstuff()
+    time.sleep(2)
+    stockss()
   elif immediatebuy.lower() != "look" and immediatebuy.lower() != "buy" and immediatebuy.lower() != "sell" and immediatebuy.lower() != "menue":
     print("I don't understand what you mean by that.")
+    time.sleep(1)
     stockss()
   elif immediatebuy.lower() == "menue":
     menue()
@@ -249,7 +273,11 @@ def stockss():
 
         shevessmoocha(cost, "minus")
         
-        print("Transaction complete.")
+        print("Transaction complete.\n")
+        print(f"You bought {shares} share(s) of {keye}!")
+        wowyouboughtsommit = f"You bought {shares} share(s) of {keye} at {date_string}!"
+        historychange(wowyouboughtsommit)
+        refreshvariables()
         time.sleep(2)
         wow()
         menue()
@@ -277,14 +305,14 @@ def stockss():
           time.sleep(1)
           stockss()
         elif int(howmanywannasell) <= listofstonke[sellwhichonese]:
-          shevessstocks(sellwhichonese, howmanywannasell, "minus")
-
           dakey, davalue = stonke(sellwhichonese, sellwhichonese)
-
           multiply = float(davalue) * float(howmanywannasell)
+          
+          shevessstocks(sellwhichonese, howmanywannasell, "minus")
           
           shevessmoocha(multiply, "plus")
           print("Sell complete.")
+          refreshvariables()
           time.sleep(2)
           menue()
 
@@ -304,14 +332,24 @@ def Start():
 
 def menue():
   rounded_moocha = round(float(money), 2)
+  formattedmoocha = "{:,}".format(rounded_moocha)
+  
   refreshvariables() 
-  print("\nMoney: ", rounded_moocha, "$")
+  time.sleep(0.001)
+  refreshvariables() 
+  
+  print("\nMoney: ", formattedmoocha, "$")
   print("Experience level: ", experience_level)
   print("\nStocks:\n")
   for k, v in stocks.items():
-    print(f"{k}: {v}")
+    v_as_notzero = ""
+    if v == 0:
+      v_as_notzero = "-"
+    elif v != 0:
+      v_as_notzero = v
+    print(f"{k}: {v_as_notzero}")
     
-  answr = input("\nWrite 'stocks', 'codes', or 'mystocks' to go there: ")
+  answr = input("\nWrite 'stocks', 'codes', 'history' or 'mystocks' to go there: ")
 
   if answr.lower() == "stocks":
     stockss()    
@@ -332,9 +370,11 @@ def menue():
       ashoiasefiasp = input("Amount: ")
       if asiaepfspi.lower() == "plus":
         shevessmoocha(ashoiasefiasp, "plus")
+        refreshvariables()
         menue()
       elif asiaepfspi.lower() == "minus":
         shevessmoocha(ashoiasefiasp, "minus")
+        refreshvariables()
         menue()
     else:
       print("That is not a code.")
@@ -344,9 +384,17 @@ def menue():
     checkstocks()
     time.sleep(2)
     menue()
+
+  elif answr.lower() == "history":
+    print("\n")
+    for i in history:
+      print("'" + str(i) + "'")
+    time.sleep(2)
+    menue()
       
   else:
     print("I don't understand what you mean.")
+    time.sleep(1)
     answr = ""
     wow()
     menue()

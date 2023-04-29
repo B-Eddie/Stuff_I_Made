@@ -14,13 +14,13 @@ def printsymbolpricesandstuff():
       try:
         #price
         regularmatketprice = ticker.info['regularMarketPrice']
-        formatted_mrketprice = '{:,.1f}'.format(regularmatketprice)
+        formatted_mrketprice = '{:,.2f}'.format(regularmatketprice)
       
         print(f"Current price: ${formatted_mrketprice}")
         
       except KeyError:
         regularmatketopen = ticker.info['regularMarketOpen']
-        formatted_open = '{:,.1f}'.format(regularmatketopen)
+        formatted_open = '{:,.2f}'.format(regularmatketopen)
         
         print(f"Open price: ${formatted_open}")
         
@@ -30,6 +30,7 @@ def printsymbolpricesandstuff():
         formatted_mrketcap = '{:,.1f}'.format(regularmarketcap)
         
         market_cap = ticker.info['marketCap']
+        
         rounded_market_cap = round(market_cap / 1_000_000_000, 2)
         print(f"Market cap: ${formatted_mrketcap}") 
         print(f"Rounded market cap: {rounded_market_cap} B") 

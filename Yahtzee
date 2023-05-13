@@ -9,6 +9,16 @@ upper_subtotal = ones + twos + threes + fours + fives + sixes
 upper_bonus = 35 if upper_subtotal >= 63 else 0
 upper_total = upper_subtotal + upper_bonus
 
+three_of_a_kind = 2
+four_of_a_kind = 3
+full_house = 20
+small_straight = 30
+large_straight = 30
+yahtzee = 30
+chance = 20
+
+total = three_of_a_kind + four_of_a_kind + full_house+ small_straight + large_straight + yahtzee + chance 
+
 scoresheet = f"""========================================
 | UPPER SECTION                       |
 ========================================

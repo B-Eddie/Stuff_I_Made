@@ -1,0 +1,75 @@
+def add_object(object_from_usr, bin_):
+    bin_mapping = {
+        'recycling': 'recycling.txt',
+        'recycling bin': 'recycling.txt',
+        'garbage': 'garbage.txt',
+        'garbage bin': 'garbage.txt',
+        'black bin': 'garbage.txt',
+        'black': 'garbage.txt',
+        'green': 'green_bin.txt',
+        'green bin': 'green_bin.txt',
+    }
+
+    if bin_ in bin_mapping:
+        file_name = bin_mapping[bin_]
+        with open('bins/' + file_name, 'a') as the_bin:
+            the_bin.write("\n")
+            the_bin.write(object_from_usr)
+    else:
+        print("Invalid bin specified.")
+
+
+def search_bin(searched_object):
+    split_object = searched_object.split(" ")
+
+    if any(i == "container" for i in split_object):
+        return "Recycling"
+
+    with open('bins/recycling.txt', 'r') as recycling_search:
+        if searched_object.lower() in (line.strip().lower() for line in recycling_search):
+            return "Recycling"
+
+    with open('bins/garbage.txt', 'r') as garbage_search:
+        if searched_object.lower() in (line.strip().lower() for line in garbage_search):
+            return "Garbage"
+
+    with open('bins/green_bin.txt', 'r') as green_bin_search:
+        if searched_object.lower() in (line.strip().lower() for line in green_bin_search):
+            return "Green Bin"
+
+    # ------now plural
+
+    with open('bins/recycling.txt', 'r') as recycling_search:
+        if searched_object.lower() + "s" in (line.strip().lower() for line in recycling_search):
+            return "Recycling"
+
+    with open('bins/garbage.txt', 'r') as garbage_search:
+        if searched_object.lower() + "s" in (line.strip().lower() for line in garbage_search):
+            return "Garbage"
+
+    with open('bins/green_bin.txt', 'r') as green_bin_search:
+        if searched_object.lower() + "s" in (line.strip().lower() for line in green_bin_search):
+            return "Green Bin"
+    return "Not in the list."
+
+
+def main():
+    while True:
+        user_input = input("What object do you want to search for?: ")
+
+        found = search_bin(user_input)
+        print(found)
+        if found == "Not in the list.":
+            add_a_new_object = input("\nThat object is not in the list. Would you like to add it?: ").lower()
+            if add_a_new_object.startswith('y'):
+                while True:
+                    which_bin = input("\nWhich bin does it go in?: ")
+
+                    add_object(user_input, which_bin)
+
+                    _last_ = input("\nDone. Would you like to keep on asking?: ").lower()
+                    if not _last_.startswith('y'):
+                        exit()
+
+
+main()

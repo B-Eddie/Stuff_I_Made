@@ -1,0 +1,80 @@
+import pyautogui
+import cv2
+import numpy as np
+import keyboard
+import time
+
+#  https://orteil.dashnet.org/cookieclicker/v10466/
+
+
+# Define the region of interest (ROI) where the game area is located on the screen
+game_area = (0, 68, 1918, 1079)  # Update with actual values
+
+# Define the color range to filter
+lower_color = np.array([0, 0, 0])  # Lower bound of color range (B, G, R)la
+upper_color = np.array([200, 200, 200])  # Upper bound of color range (B, G, R)
+
+autoclick = False
+
+
+def check_store():
+    first_store_item = pyautogui.pixel(1628, 481)
+    if first_store_item == (223, 203, 167):
+        return 'store-top'
+    else:
+        pass
+
+    factory = pyautogui.pixel(1821, 890)
+    if factory == (142, 138, 125):
+        return 'factory'
+
+    mine = pyautogui.pixel(1821, 822)
+    if mine == (153, 152, 135):
+        return 'mine'
+
+    farm = pyautogui.pixel(1821, 754)
+    if farm == (137, 137, 124):
+        return 'farm'
+
+    grandma = pyautogui.pixel(1821, 686)  # grandma can buy = 141, 139, 121
+    if grandma == (141, 139, 121):
+        return 'grandma'
+
+    cursor = pyautogui.pixel(1821, 618)  # 68 difference
+    if cursor == (140, 138, 126):
+        return 'cursor'
+
+
+def start():
+    while True:
+        if keyboard.is_pressed('x'):
+            exit()
+
+        if check_store() is None:
+            pyautogui.moveTo(292, 466)
+            pyautogui.click()
+        else:
+            which_store = check_store()
+            if which_store == 'store-top':
+                pyautogui.moveTo(1628, 481)
+                pyautogui.click()  # can change it to the like the .mousedown() and then mouseup after
+            elif which_store == "factory":
+                pyautogui.moveTo(1821, 890)
+                pyautogui.click()
+            elif which_store == "mine":
+                pyautogui.moveTo(1821, 822)
+                pyautogui.click()
+            elif which_store == "farm":
+                pyautogui.moveTo(1821, 754)
+                pyautogui.click()
+            elif which_store == "grandma":
+                pyautogui.moveTo(1821, 686)
+                pyautogui.click()
+            elif which_store == "cursor":
+                pyautogui.moveTo(1821, 618)
+                pyautogui.click()
+
+
+while True:
+    if keyboard.is_pressed("s"):
+        start()

@@ -1,0 +1,128 @@
+import chess
+import chess.engine
+import pyautogui
+import keyboard
+import time
+import cv2
+import numpy as np
+from PIL import ImageGrab
+import matplotlib.pyplot as plt
+
+engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish-windows-x86-64-avx2.exe")
+
+def FindBestMove(fen):
+    fen = fen
+    board = chess.Board(fen)
+
+    # Use Stockfish to find the best move for the position
+    result = engine.play(board, chess.engine.Limit(time=2.0))
+    best_move = result.move
+
+    return best_move
+
+
+print("Put your mouse on the bottom left corner of the chess board and press \"space\"")
+keyboard.wait("space")
+bcx, bcy = pyautogui.position()
+print(bcx, bcy)
+time.sleep(1)
+
+print("Now put your mouse on the top right corner and press space.")
+keyboard.wait("space")
+tcx, tcy = pyautogui.position()
+print(tcx, tcy)
+
+
+area = (bcx, tcy, tcx, bcy)
+
+screenshot = ImageGrab.grab(bbox=area)
+screenshot_np = np.array(screenshot)
+
+gray = cv2.cvtColor(screenshot_np, cv2.COLOR_BGR2GRAY)
+
+# Calculate the width and height of each grid cell
+height, width = gray.shape[:2]
+cell_width = width // 8
+cell_height = height // 8
+
+# Split the screenshot into a grid of 8x8
+grid = []
+for y in range(8):
+    for x in range(8):
+        left = x * cell_width
+        top = y * cell_height
+        right = left + cell_width
+        bottom = top + cell_height
+        cell = gray[top:bottom, left:right]
+        grid.append(cell)
+
+reference_images = {
+    'white_king_black_square': cv2.imread('grid_cell_60.png', cv2.IMREAD_GRAYSCALE),
+    'white_queen_white_square': cv2.imread('grid_cell_59.png', cv2.IMREAD_GRAYSCALE),
+    'white_rook_white_square': cv2.imread('grid_cell_63.png', cv2.IMREAD_GRAYSCALE),
+    'white_rook_black_square': cv2.imread('grid_cell_56.png', cv2.IMREAD_GRAYSCALE),
+    'white_bishop_white_square': cv2.imread('grid_cell_61.png', cv2.IMREAD_GRAYSCALE),
+    'white_bishop_black_square': cv2.imread('grid_cell_58.png', cv2.IMREAD_GRAYSCALE),
+    'white_knight_white_square': cv2.imread('grid_cell_57.png', cv2.IMREAD_GRAYSCALE),
+    'white_knight_black_square': cv2.imread('grid_cell_62.png', cv2.IMREAD_GRAYSCALE),
+    'white_pawn_white_square': cv2.imread('grid_cell_48.png', cv2.IMREAD_GRAYSCALE),
+    'white_pawn_black_square': cv2.imread('grid_cell_49.png', cv2.IMREAD_GRAYSCALE),  #end
+    'black_king_white_square': cv2.imread('grid_cell_4.png', cv2.IMREAD_GRAYSCALE),
+    'black_queen_black_square': cv2.imread('grid_cell_3.png', cv2.IMREAD_GRAYSCALE),
+    'black_rook_white_square': cv2.imread('grid_cell_0.png', cv2.IMREAD_GRAYSCALE),
+    'black_rook_black_square': cv2.imread('grid_cell_7.png', cv2.IMREAD_GRAYSCALE),
+    'black_bishop_white_square': cv2.imread('grid_cell_2.png', cv2.IMREAD_GRAYSCALE),
+    'black_bishop_black_square': cv2.imread('grid_cell_5.png', cv2.IMREAD_GRAYSCALE),
+    'black_knight_white_square': cv2.imread('grid_cell_6.png', cv2.IMREAD_GRAYSCALE),
+    'black_knight_black_square': cv2.imread('grid_cell_1.png', cv2.IMREAD_GRAYSCALE),
+    'black_pawn_white_square': cv2.imread('grid_cell_15.png', cv2.IMREAD_GRAYSCALE),
+    'black_pawn_black_square': cv2.imread('grid_cell_14.png', cv2.IMREAD_GRAYSCALE),
+    'black_space': cv2.imread('grid_cell_17.png', cv2.IMREAD_GRAYSCALE),
+}
+
+for i, cell in enumerate(grid):
+    best_match = None
+    best_match_score = 0
+
+    # Check if the cell image is already in grayscale
+    if len(cell.shape) > 2:
+        # Convert the grid cell image to grayscale
+        gray_cell = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
+    else:
+        gray_cell = cell
+
+    # Iterate over the reference images and find the best match
+    for piece_name, reference_image in reference_images.items():
+        # Perform feature extraction and matching
+
+        # Initialize the ORB detector
+        orb = cv2.ORB_create()
+
+        # Find the keypoints and compute the descriptors for the grid cell and reference image
+        kp_cell, des_cell = orb.detectAndCompute(gray_cell, None)
+        kp_ref, des_ref = orb.detectAndCompute(reference_image, None)
+
+        # Create a Brute-Force Matcher
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+        # Match the descriptors
+        matches = bf.match(des_cell, des_ref)
+
+        # Calculate the similarity score based on the number of matches
+        similarity_score = len(matches)
+
+        # Update the best match if the current similarity score is higher
+        if similarity_score > best_match_score:
+            best_match_score = similarity_score
+            best_match = piece_name
+
+    # Print the best match for the current grid cell image
+    if best_match:
+        print(f"Grid cell {i} contains {best_match}")
+    plt.subplot(8, 8, i + 1)  # Create a subplot for each grid cell
+    plt.imshow(cell, cmap='gray')  # Display the grid cell image in grayscale
+    plt.axis('off')
+plt.show()
+
+
+engine.quit()

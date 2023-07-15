@@ -1,0 +1,87 @@
+import chess
+import chess.engine
+import pyautogui
+import keyboard
+import time
+import cv2
+import numpy as np
+from PIL import ImageGrab
+import matplotlib.pyplot as plt
+import math
+
+color = ""
+
+engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish-windows-x86-64-avx2.exe")
+
+def FindBestMove(fen):
+    fen = fen
+    board = chess.Board(fen)
+
+    # Use Stockfish to find the best move for the position
+    result = engine.play(board, chess.engine.Limit(time=2.0))
+    best_move = result.move
+
+    return best_move
+
+
+print("Put your mouse on the bottom left corner of the chess board and press \"space\"")
+keyboard.wait("space")
+bcx, bcy = pyautogui.position()
+print(bcx, bcy)
+time.sleep(1)
+
+print("Now put your mouse on the top right corner and press space.")
+keyboard.wait("space")
+tcx, tcy = pyautogui.position()
+print(tcx, tcy)
+
+
+
+x = bcx  # Replace with the actual x-coordinate
+y = tcy  # Replace with the actual y-coordinate
+roi_width = tcx  # Replace with the actual width of the ROI
+roi_height = bcy  # Replace with the actual height of the ROI
+roi = (x, y, roi_width, roi_height)
+
+# Capture screenshot of the ROI
+screenshot = pyautogui.screenshot(region=roi)
+screenshot = np.array(screenshot)
+
+# Convert color space to grayscale
+gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+
+# Define the chessboard size
+board_size = 8
+
+# Calculate the cell width and height
+cell_width = roi_width // board_size
+cell_height = roi_height // board_size
+
+# Initialize the ASCII chessboard representation
+ascii_chessboard = ""
+
+# Iterate over the cells and convert each to ASCII
+for row in range(board_size):
+    for col in range(board_size):
+        # Extract the cell region
+        cell_left = col * cell_width
+        cell_top = row * cell_height
+        cell_right = cell_left + cell_width
+        cell_bottom = cell_top + cell_height
+        cell = gray[cell_top:cell_bottom, cell_left:cell_right]
+
+        # Perform cell processing and convert to ASCII
+        # Replace the following line with your cell processing and ASCII conversion logic
+        ascii_piece = " "  # Example: Empty cell represented by a space
+
+        # Append the ASCII piece to the chessboard representation
+        ascii_chessboard += ascii_piece + " "
+
+    # Add a new line after each row
+    ascii_chessboard += "\n"
+
+# Print the ASCII chessboard representation
+print(ascii_chessboard)
+
+
+engine.quit()

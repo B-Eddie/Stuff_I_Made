@@ -13,6 +13,7 @@ color = ""
 
 engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish-windows-x86-64-avx2.exe")
 
+
 def FindBestMove(fen):
     fen = fen
     board = chess.Board(fen)
@@ -38,21 +39,20 @@ print(tcx, tcy)
 x_difference = math.floor((tcx - bcx) / 8)
 y_difference = math.floor((tcy - bcy) / 8)
 
+piece_color = [333, 943]
 
-piece_color = []
-
-white_color = ()
-black_color = ()
+white_color = (248, 248, 248)
+black_color = (85, 83, 82)
 
 white_color_emptyspace = (238, 238, 213)
 black_color_emptyspace = (124, 149, 93)
 
-white_pawn = [] # x plus what = pawn position, y plus what = pawn position
-white_rook = []
-white_knight = []
-white_bishop = []
-white_queen = []
-white_king = []
+white_pawn = [81, -33]  # x plus what = pawn position, y plus what = pawn position
+white_rook = [25, -75]
+white_knight = [23, -58]
+white_bishop = [90, -75]
+white_queen = [35, -88]
+white_king = [13, -51]
 
 black_pawn = []
 black_rook = []
@@ -61,73 +61,71 @@ black_bishop = []
 black_queen = []
 black_king = []
 
-
 board_coordinates = {}
-board_piece_place = {} # coor: 'piece'
+board_piece_place = {}  # coor: 'piece'
 
 for row in range(1, 9):
     for col in range(1, 9):
         x = bcx + x_difference * col
         y = bcy + y_difference * col
-        board_coordinates[row * col] = [x, y] #cell number: coordinates
+        board_coordinates[row * col] = [x, y]  # cell number: coordinates
 
 for cell in board_coordinates:
-  color_piece = pyautogui.pixel(list[cell][0] + piece_color[0], list[cell][1] + piece_color[1])
+    color_piece = pyautogui.pixel(board_coordinates[cell][0] + piece_color[0], board_coordinates[cell][1] + piece_color[1])
 
-  if color_piece == white_color_emptyspace:
-    board_piece_place[board_coordinates[cell] = "white_space"
-  elif color_piece == black_color_emptyspace:
-    board_piece_place[board_coordinates[cell] = "black_space"
-  else:
-    if color_piece == white_color:
-      white_pawn_pixel = pyautogui.pixel(list[cell][0] + white_pawn[0], list[cell][1] + white_pawn[1]) # all the 'cell' are the cell number
-      if pawn_pixel == ():
-        board_piece_place[board_coordinates[cell] = "white_pawn"
-      else:
-        white_rook_pixel = pyautogui.pixel(list[cell][0] + white_pawn[0], list[cell][1] + white_pawn[1])
-        if white_rook_pixel == ():
-          board_piece_place[board_coordinates[cell] = "white_rook"
-        else:
-          white_knight_pixel = pyautogui.pixel(list[cell][0] + white_knight[0], list[cell][1] + white_knight[1])
-          if white_knight_pixel == ():
-            board_piece_place[board_coordinates[cell] = "white_knight"
-          else:
-            white_bishop_pixel = pyautogui.pixel(list[cell][0] + white_bishop[0], list[cell][1] + white_bishop[1])
-            if white_bishop_pixel == ():
-              board_piece_place[board_coordinates[cell] = "white_bishop"
+    if color_piece == white_color_emptyspace:
+        board_piece_place[board_coordinates][cell] = "white_space"
+    elif color_piece == black_color_emptyspace:
+        board_piece_place[board_coordinates][cell] = "black_space"
+    else:
+        if color_piece == white_color:
+            white_pawn_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_pawn[0], board_coordinates[cell][1] + white_pawn[1])  # all the 'cell' are the cell number
+            if white_pawn_pixel == (71, 71, 71):
+                board_piece_place[board_coordinates][cell] = "white_pawn"
             else:
-              white_queen_pixel = pyautogui.pixel(list[cell][0] + white_queen[0], list[cell][1] + white_queen[1])
-              if white_queen_pixel == ():
-                board_piece_place[board_coordinates[cell] = "white_queen"
-              else:
-              white_king_pixel = pyautogui.pixel(list[cell][0] + white_king[0], list[cell][1] + white_king[1])
-              if white_king_pixel == ():
-                board_piece_place[board_coordinates[cell] = "white_king"
-  
-      else:
-        black_pawn_pixel = pyautogui.pixel(list[cell][0] + black_pawn[0], list[cell][1] + black_pawn[1]) # all the 'cell' are the cell number
-        if pawn_pixel == ():
-          board_piece_place[board_coordinates[cell] = "black_pawn"
-        else:
-          black_rook_pixel = pyautogui.pixel(list[cell][0] + black_pawn[0], list[cell][1] + black_pawn[1])
-          if black_rook_pixel == ():
-            board_piece_place[board_coordinates[cell] = "black_rook"
-          else:
-            black_knight_pixel = pyautogui.pixel(list[cell][0] + black_knight[0], list[cell][1] + black_knight[1])
-            if black_knight_pixel == ():
-              board_piece_place[board_coordinates[cell] = "black_knight"
-            else:
-              black_bishop_pixel = pyautogui.pixel(list[cell][0] + black_bishop[0], list[cell][1] + black_bishop[1])
-              if black_bishop_pixel == ():
-                board_piece_place[board_coordinates[cell] = "black_bishop"
-              else:
-                black_queen_pixel = pyautogui.pixel(list[cell][0] + black_queen[0], list[cell][1] + black_queen[1])
-                if black_queen_pixel == ():
-                  board_piece_place[board_coordinates[cell] = "black_queen"
+                white_rook_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_pawn[0], board_coordinates[cell][1] + white_pawn[1])
+                if white_rook_pixel == (72, 72, 72):
+                    board_piece_place[board_coordinates][cell] = "white_rook"
                 else:
-                black_king_pixel = pyautogui.pixel(list[cell][0] + black_king[0], list[cell][1] + black_king[1])
-                if black_king_pixel == ():
-                  board_piece_place[board_coordinates[cell] = "black_king"
-    
-  
+                    white_knight_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_knight[0], board_coordinates[cell][1] + white_knight[1])
+                    if white_knight_pixel == (81, 81, 81):
+                        board_piece_place[board_coordinates][cell] = "white_knight"
+                    else:
+                        white_bishop_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_bishop[0], board_coordinates[cell][1] + white_bishop[1])
+                        if white_bishop_pixel == (94, 93, 93):
+                            board_piece_place[board_coordinates][cell] = "white_bishop"
+                        else:
+                            white_queen_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_queen[0], board_coordinates[cell][1] + white_queen[1])
+                            if white_queen_pixel == (70, 70, 70):
+                                board_piece_place[board_coordinates][cell] = "white_queen"
+                            else:
+                                white_king_pixel = pyautogui.pixel(board_coordinates[cell][0] + white_king[0], board_coordinates[cell][1] + white_king[1])
+                                if white_king_pixel == (81, 81, 81):
+                                    board_piece_place[board_coordinates][cell] = "white_king"
+
+        else:
+            black_pawn_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_pawn[0], board_coordinates[cell][1] + black_pawn[1])  # all the 'cell' are the cell number
+            if black_pawn_pixel == ():
+                board_piece_place[board_coordinates][cell] = "black_pawn"
+            else:
+                black_rook_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_pawn[0], board_coordinates[cell][1] + black_pawn[1])
+                if black_rook_pixel == ():
+                    board_piece_place[board_coordinates][cell] = "black_rook"
+                else:
+                    black_knight_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_knight[0], board_coordinates[cell][1] + black_knight[1])
+                    if black_knight_pixel == ():
+                        board_piece_place[board_coordinates][cell] = "black_knight"
+                    else:
+                        black_bishop_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_bishop[0], board_coordinates[cell][1] + black_bishop[1])
+                        if black_bishop_pixel == ():
+                            board_piece_place[board_coordinates][cell] = "black_bishop"
+                        else:
+                            black_queen_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_queen[0], board_coordinates[cell][1] + black_queen[1])
+                            if black_queen_pixel == ():
+                                board_piece_place[board_coordinates][cell] = "black_queen"
+                            else:
+                                black_king_pixel = pyautogui.pixel(board_coordinates[cell][0] + black_king[0], board_coordinates[cell][1] + black_king[1])
+                                if black_king_pixel == ():
+                                    board_piece_place[board_coordinates][cell] = "black_king"
+
 engine.quit()

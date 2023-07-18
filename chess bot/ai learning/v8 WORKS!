@@ -1,0 +1,229 @@
+import chess
+import chess.engine
+import pyautogui
+import keyboard
+import time
+import cv2
+import numpy as np
+from PIL import Image, ImageGrab
+import os
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import scipy
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, Lambda
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+model = load_model("chess_piece_recognition_model.h5")
+
+engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish-windows-x86-64-avx2.exe")
+
+
+def FindBestMove(fen):
+    fen = fen
+    board = chess.Board(fen)
+
+    # Use Stockfish to find the best move for the position
+    result = engine.play(board, chess.engine.Limit(time=2.0))
+    best_move = result.move
+
+    return best_move
+
+
+print("Put your mouse on the bottom left corner of the chess board and press \"space\"")
+keyboard.wait("space")
+bcx, bcy = pyautogui.position()
+print(bcx, bcy)
+time.sleep(1)
+
+print("Now put your mouse on the top right corner and press space.")
+keyboard.wait("space")
+tcx, tcy = pyautogui.position()
+print(tcx, tcy)
+
+area = (bcx, tcy, tcx, bcy)
+screenshot = ImageGrab.grab(bbox=area)
+screenshot_np = np.array(screenshot)
+gray = cv2.cvtColor(screenshot_np, cv2.COLOR_BGR2GRAY)
+
+# Calculate the width and height of each grid cell
+height, width = gray.shape[:2]
+cell_width = width // 8
+cell_height = height // 8
+
+"""
+IMAGE_SIZE = (103, 102)
+
+data_augmentation = Sequential([
+    #tf.keras.layers.RandomFlip("horizontal", input_shape=(*IMAGE_SIZE, 3)),
+    tf.keras.layers.RandomRotation(0.1),
+    tf.keras.layers.RandomZoom(0.1),
+])
+
+
+train_data_gen = ImageDataGenerator(
+    rescale=1.0 / 255,
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    validation_split=0.2,
+)
+
+train_generator = train_data_gen.flow_from_directory(
+    'ai-data',  # Replace with the path to your dataset directory
+    target_size=IMAGE_SIZE,
+    batch_size=32,
+    class_mode='categorical',
+    subset='training',
+)
+
+validation_generator = train_data_gen.flow_from_directory(
+    'practice-ai',  # Replace with the path to your dataset directory
+    target_size=IMAGE_SIZE,
+    batch_size=32,
+    class_mode='categorical',
+    subset='validation',
+)
+
+
+# Load the pre-trained MobileNetV2 model
+base_model = MobileNetV2( #MobileNetV2  or tf.keras.applications.ResNet50
+    input_shape=(*IMAGE_SIZE, 3),
+    include_top=False,
+    weights='imagenet'
+)
+
+
+# Freeze the base model layers
+base_model.trainable = False
+
+# Add custom classification head
+model = Sequential([
+    data_augmentation,
+    base_model,
+    GlobalAveragePooling2D(),
+    Dense(256, activation='relu'),
+    Dropout(0.5),
+    Dense(28, activation='softmax')  # Replace 14 with the number of chess piece classes
+])
+
+# Compile the model
+model.compile(optimizer=Adam(), loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(
+    train_generator,
+    steps_per_epoch=train_generator.samples // train_generator.batch_size,
+    validation_data=validation_generator,
+    validation_steps=validation_generator.samples // validation_generator.batch_size,
+    epochs=10,  # 10
+)
+
+
+# Save the model for later use
+model.save('chess_piece_recognition_model.h5')"""
+
+# Load the test image
+test_images_folder = "screenshots_for_board/"
+image_files = [os.path.join(test_images_folder, file) for file in os.listdir(test_images_folder) if
+               file.endswith(".png")]
+
+# Assuming your model has 7 classes (empty, pawn, rook, knight, bishop, queen, king)
+chess_piece_mapping = {
+    0: '1black_bishop',
+    1: '1black_king',
+    2: '1black_knight',
+    3: '1black_pawn',
+    4: '1black_queen',
+    5: '1black_rook',
+    6: '1black_space',
+    7: '1white_bishop',
+    8: '1white_king',
+    9: '1white_knight',
+    10: '1white_pawn',
+    11: '1white_queen',
+    12: '1white_rook',
+    13: '1white_space',
+    14: 'black_bishop',
+    15: 'black_king',
+    16: 'black_knight',
+    17: 'black_pawn',
+    18: 'black_queen',
+    19: 'black_rook',
+    20: 'black_space',
+    21: 'white_bishop',
+    22: 'white_king',
+    23: 'white_knight',
+    24: 'white_pawn',
+    25: 'white_queen',
+    26: 'white_rook',
+    27: 'white_space',
+}
+
+file_path = "screenshots_for_board/"
+files = os.listdir(file_path)
+
+for i in files:
+    file_path_to_delete = os.path.join(file_path, i)
+    os.remove(file_path_to_delete)
+
+for y in range(8):
+    for x in range(8):
+        left = x * cell_width
+        top = y * cell_height
+        right = left + cell_width
+        bottom = top + cell_height
+        cell = screenshot.crop((left, top, right, bottom))
+        name = f"{x}_{y}.png"
+        cell.save(os.path.join(file_path, name))
+
+all_the_pieces = []
+
+
+def predictImages(*list):
+    for image_path in list:
+        img = tf.keras.utils.load_img(image_path, target_size=(103, 102))
+        img_array = tf.keras.utils.img_to_array(img)
+        img_array = tf.expand_dims(img_array, 0)  # Create a batch dimension
+
+        # Preprocess the image (optional, depends on how the model was trained)
+        img_array /= 255.0
+
+        # Make prediction using the model
+        predictions = model.predict(img_array)
+
+        # Get the predicted class index and corresponding piece name
+        predicted_class = np.argmax(predictions[0])
+        if predicted_class in chess_piece_mapping:
+            predicted_piece = chess_piece_mapping[predicted_class]
+        else:
+            predicted_piece = "unknown"
+
+        # Get the confidence score of the prediction
+        confidence_score = 100 * np.max(tf.nn.softmax(predictions[0]))
+
+        print(
+            f"Image: {os.path.basename(image_path)} - Predicted piece: {predicted_piece} - Confidence: {confidence_score:.2f}%")
+        all_the_pieces.append(predicted_piece)
+
+
+predictImages(*image_files)
+
+piece_letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+coordinates_of_pieces = {}  # {1, 2: }
+
+for i, piece in enumerate(all_the_pieces):
+    row = piece_letters[i // 8]
+    col = 8 - (i % 8)
+    coordinate = f"{row}, {col}"
+    coordinates_of_pieces[coordinate] = piece
+print(coordinates_of_pieces)
+
+exit()
+# engine.quit()
